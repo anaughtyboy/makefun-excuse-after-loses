@@ -36,9 +36,13 @@ function main(): void {
   const outPath = join(outDir, "entry.txt");
   writeFileSync(outPath, excuse, "utf8");
 
-  const back = readFileSync(outPath, "utf8");
-  if (back !== excuse) {
+  const back = readFileSync(outPath);
+  const expected = Buffer.from(excuse, "utf8");
+  if (!back.equals(expected)) {
     throw new Error("read-back mismatch: file does not hold the excuse");
+  }
+  if (back.length === 0 || back[back.length - 1] === 0x0a) {
+    throw new Error("entry must not end with a newline");
   }
 
   console.log(`wrote ${excuse.length} characters to ${outPath}`);
